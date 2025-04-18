@@ -1,0 +1,29 @@
+services:
+  laravel:
+    image: bitnami/laravel:10
+    deploy:
+      replicas: 8 # Defina 8 réplicas fixas
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "128M"
+      restart_policy:
+        condition: on-failure
+    networks:
+      - app-network
+    ports:
+      - "8080" # Porta para comunicação interna no Swarm
+
+  haproxy:
+    image: haproxy:latest
+    ports:
+      - "80:80" # Porta onde o HAProxy será acessível
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: overlay
+    attachable: true
